@@ -49,11 +49,7 @@ fn main() {
         controller::set_keys(window.get_keys(), &mut interpreter);
 
         for _ in 0..(EMULATOR_FREQUENCY / FRAMERATE) {
-            chip8::run(&mut interpreter, false);
-        }
-
-        if interpreter.queued_draw {
-            chip8::run(&mut interpreter, true);
+            chip8::run(&mut interpreter);
         }
 
         timer::timer_update(&mut interpreter);

@@ -16,10 +16,6 @@ pub struct CHIP8 {
     pub keys: [u8; 16],
     pub memory: [u8; 4096],
     pub display: [u8; 2048],
-    pub queued_draw: bool,
-    queued_x: u8,
-    queued_y: u8,
-    queued_nibble: u8,
 }
 
 impl CHIP8 {
@@ -35,16 +31,12 @@ impl CHIP8 {
             keys: [0; 16],
             memory: [0; 4096],
             display: [0; 2048],
-            queued_draw: false,
-            queued_x: 0,
-            queued_y: 0,
-            queued_nibble: 0,
         }
     }
 }
 
 #[allow(arithmetic_overflow)]
-pub fn run(interpreter: &mut CHIP8, draw_call: bool) {
+pub fn run(interpreter: &mut CHIP8) {
 
     fn _print_screen(interpreter: &CHIP8) {
         for i in (0..(2048 - 64 + 1)).step_by(64) {
@@ -250,20 +242,12 @@ pub fn run(interpreter: &mut CHIP8, draw_call: bool) {
         }
 
         0xD000 => {  // DRW Vx, Vy, nibble - Draw sprite
-            interpreter.queued_draw = true;
-            interpreter.queued_x = x;
-            interpreter.queued_y = y;
-            interpreter.queued_nibble = nibble;
-            // Should also queue PC and VI
-            // Store them in a vector, then iterate over them
-            // once the draw instruction is called externally.
-
-            // ALTERNATIVE METHOD:
-            // Stall the CPU for the remaining cycles on the current frame
+            /* V-Sync support:
+            Stall the CPU for the remaining cycles on the current frame.
             if !draw_call {
-                //interpreter.pc -= 2;
+                interpreter.pc -= 2;
                 return;
-            }
+            } */       
 
             let mut sprite: [i16; 15] = [0; 15];
 
