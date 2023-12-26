@@ -1,8 +1,3 @@
-__pycache__/CHIP8.cpython-310.pyc
+__pycache__/
 .vscode/settings.json
-__pycache__/Font.cpython-310.pyc
-__pycache__/Input.cpython-310.pyc
-__pycache__/ROM.cpython-310.pyc
-__pycache__/Screen.cpython-310.pyc
-__pycache__/Timer.cpython-310.pyc
 Rust/target

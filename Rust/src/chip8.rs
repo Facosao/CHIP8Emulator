@@ -3,8 +3,6 @@ use super::font;
 const DT: usize = 0;
 const ST: usize = 1;
 
-// TODO: ADD SUPPORT FOR RANDOM - C000
-
 pub struct CHIP8 {
     key_pressed: bool,
     pc: u16,
@@ -37,7 +35,6 @@ impl CHIP8 {
 
 #[allow(arithmetic_overflow)]
 pub fn run(interpreter: &mut CHIP8) {
-
     fn _print_screen(interpreter: &CHIP8) {
         for i in (0..(2048 - 64 + 1)).step_by(64) {
             for j in 0..64 {
@@ -179,12 +176,12 @@ pub fn run(interpreter: &mut CHIP8) {
                 }
 
                 0x0006 => {  // SHR Vx {, Vy} - Shift Vx right by 1 bit, then store Vx LSB into VF
-                    //let old_vx = v[x as usize];
-                    //v[x as usize] >>= 1;
-                    let old_v = v[y as usize];
-                    v[x as usize] = v[y as usize] >> 1;
+                    let old_vx = v[x as usize];
+                    v[x as usize] >>= 1;
+                    //let old_v = v[y as usize];
+                    //v[x as usize] = v[y as usize] >> 1;
 
-                    if (old_v & 1) == 1 {
+                    if (old_vx & 1) == 1 {
                         v[0xF] = 1;
                     } else {
                         v[0xF] = 0;
@@ -203,13 +200,13 @@ pub fn run(interpreter: &mut CHIP8) {
                 }
 
                 0x000E => {  // SHL Vx {, Vy} - Shift Vx left by 1 bit, then store Vx MSB into VF
-                    //let old_vx = v[x as usize];
-                    //v[x as usize] <<= 1;
-                    let old_v = v[y as usize];
-                    v[x as usize] = v[y as usize] << 1;
+                    let old_vx = v[x as usize];
+                    v[x as usize] <<= 1;
+                    //let old_v = v[y as usize];
+                    //v[x as usize] = v[y as usize] << 1;
 
 
-                    if (old_v & 0b10000000) > 0 {
+                    if (old_vx & 0b10000000) > 0 {
                         v[0xF] = 1;
                     } else {
                         v[0xF] = 0;
@@ -238,7 +235,7 @@ pub fn run(interpreter: &mut CHIP8) {
         }
 
         0xC000 => {  // RND Vx, byte - Generate random number to store in Vx
-            v[x as usize] = 1 & byte; // TODO: Add RNG
+            v[x as usize] = rand::random::<u8>() & byte;
         }
 
         0xD000 => {  // DRW Vx, Vy, nibble - Draw sprite
@@ -247,7 +244,7 @@ pub fn run(interpreter: &mut CHIP8) {
             if !draw_call {
                 interpreter.pc -= 2;
                 return;
-            } */       
+            } */
 
             let mut sprite: [i16; 15] = [0; 15];
 
@@ -375,14 +372,14 @@ pub fn run(interpreter: &mut CHIP8) {
                     interpreter.memory[(interpreter.vi + 2) as usize] = v[x as usize] % 10;
                 }
 
-                0x0055 => {  // LD [I] Vx - Copy V regisers into self.memory starting from I
+                0x0055 => {  // LD [I] Vx - Copy V regisers into interpreter.memory starting from I
                     for j in 0..(x + 1) {
                         interpreter.memory[(interpreter.vi + (j as u16)) as usize] = v[j as usize];
                     }
                     interpreter.vi += (x as u16) + 1;
                 }
 
-                0x0065 => {  // LD Vx [I] - Write V registers from self.memory starting from I
+                0x0065 => {  // LD Vx [I] - Write V registers from interpreter.memory starting from I
                     for j in 0..(x + 1) {
                         v[j as usize] = interpreter.memory[(interpreter.vi + (j as u16)) as usize];
                     }
